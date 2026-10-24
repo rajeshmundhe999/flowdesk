@@ -2,7 +2,7 @@
 
 from collections.abc import Generator
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import (
@@ -20,6 +20,10 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from flowdesk.config import settings
 
 
+def utc_now() -> datetime:
+    return datetime.now(UTC)
+
+
 class Base(DeclarativeBase):
     pass
 
@@ -28,22 +32,22 @@ class Ticket(Base):
     __tablename__ = "tickets"
 
     id = Column(String(64), primary_key=True)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
-    channel = Column(String(32), nullable=False, default="email")  # email, chat, in-app, web
-    platform = Column(String(32), nullable=False)  # macos, windows, ios, android, web
+    created_at = Column(DateTime, nullable=False, default=utc_now)
+    channel = Column(String(32), nullable=False, default="email")
+    platform = Column(String(32), nullable=False)
     app_version = Column(String(32), nullable=False)
     os_version = Column(String(64), nullable=False)
     subject = Column(String(255), nullable=False)
     body = Column(Text, nullable=False)
-    plan_tier = Column(String(32), nullable=False, default="free")  # free, pro, enterprise
+    plan_tier = Column(String(32), nullable=False, default="free")
 
     # Triage metadata
     category = Column(String(64), nullable=True)
-    severity = Column(String(8), nullable=True)  # P0, P1, P2, P3
-    sentiment = Column(String(32), nullable=True)  # frustrated, neutral, satisfied
+    severity = Column(String(8), nullable=True)
+    sentiment = Column(String(32), nullable=True)
     confidence = Column(Float, nullable=True)
     triage_reason = Column(Text, nullable=True)
-    triage_method = Column(String(32), nullable=True)  # rules, llm, manual
+    triage_method = Column(String(32), nullable=True)
     matched_kb = Column(String(128), nullable=True)
     cluster_id = Column(String(64), nullable=True)
     triaged_at = Column(DateTime, nullable=True)
@@ -92,7 +96,7 @@ class Incident(Base):
     affected_versions = Column(String(255), nullable=False)
     signature = Column(String(255), nullable=False)
     summary = Column(Text, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=utc_now)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -103,12 +107,12 @@ class Incident(Base):
             "ticket_count": self.ticket_count,
             "first_seen": self.first_seen.isoformat() if self.first_seen else None,
             "last_seen": self.last_seen.isoformat() if self.last_seen else None,
-            "affected_platforms": self.affected_platforms.split(",")
-            if self.affected_platforms
-            else [],
-            "affected_versions": self.affected_versions.split(",")
-            if self.affected_versions
-            else [],
+            "affected_platforms": (
+                self.affected_platforms.split(",") if self.affected_platforms else []
+            ),
+            "affected_versions": (
+                self.affected_versions.split(",") if self.affected_versions else []
+            ),
             "signature": self.signature,
             "summary": self.summary,
             "created_at": self.created_at.isoformat() if self.created_at else None,
