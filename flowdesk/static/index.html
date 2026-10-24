@@ -31,6 +31,9 @@
         </div>
       </div>
       <div class="flex items-center space-x-2">
+        <button onclick="openCreateTicketModal()" class="px-3 py-1.5 text-xs font-semibold rounded-md bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-plus"></i> Log Customer Bug
+        </button>
         <button onclick="runIncidentDetection()" class="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
           <i class="fa-solid fa-arrows-split-up-and-left text-indigo-400"></i> Cluster Incidents
         </button>
@@ -302,6 +305,76 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LOG NEW CUSTOMER BUG / TICKET -->
+  <div id="modal-create-ticket" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full shadow-2xl overflow-hidden flex flex-col">
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="flex items-center space-x-2.5">
+          <div class="h-7 w-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+            <i class="fa-solid fa-bug text-sm"></i>
+          </div>
+          <h3 class="font-semibold text-white text-base">Log Customer Bug / Issue</h3>
+        </div>
+        <button onclick="closeCreateTicketModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="create-ticket-form" onsubmit="submitNewTicket(event)" class="p-6 space-y-4 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Subject / Headline <span class="text-rose-400">*</span></label>
+          <input type="text" id="new-ticket-subject" required placeholder="e.g. Dictation drops with ERR_PROXY_CONNECTION_FAILED on VPN" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Platform</label>
+            <select id="new-ticket-platform" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+              <option value="windows">Windows</option>
+              <option value="macos">macOS</option>
+              <option value="ios">iOS</option>
+              <option value="android">Android</option>
+              <option value="web">Web</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Plan Tier</label>
+            <select id="new-ticket-tier" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+              <option value="enterprise">Enterprise</option>
+              <option value="pro" selected>Pro</option>
+              <option value="free">Free</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">App Version</label>
+            <input type="text" id="new-ticket-app-ver" value="1.4.3" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">OS Version</label>
+            <input type="text" id="new-ticket-os-ver" value="Windows 11 23H2" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Customer Body / Reported Symptoms <span class="text-rose-400">*</span></label>
+          <textarea id="new-ticket-body" rows="4" required placeholder="Paste the customer report or bug description here... Include any error strings, hardware details, or steps they took." class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end space-x-2.5">
+          <button type="button" onclick="closeCreateTicketModal()" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition">
+            Cancel
+          </button>
+          <button type="submit" id="btn-submit-ticket" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-bolt"></i> Ingest & Auto-Triage
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

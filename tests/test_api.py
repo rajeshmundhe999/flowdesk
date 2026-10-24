@@ -107,6 +107,29 @@ def test_get_ticket_report(test_app_client):
     assert "# [BUG]" in data["markdown_report"]
 
 
+def test_create_and_triage_custom_ticket(test_app_client):
+    payload = {
+        "subject": "Audio stuttering on Bluetooth Sony XM4",
+        "body": (
+            "Whenever I dictate, the audio input switches to Hands-Free AG Audio mode "
+            "and sounds terrible."
+        ),
+        "platform": "windows",
+        "app_version": "1.4.3",
+        "os_version": "Windows 11",
+        "plan_tier": "enterprise",
+        "channel": "chat",
+    }
+    response = test_app_client.post("/api/tickets", json=payload)
+    assert response.status_code == 200
+    ticket = response.json()
+    assert ticket["id"].startswith("TCK-")
+    assert ticket["category"] == "audio/mic"
+    assert ticket["severity"] in {"P1", "P2"}
+    assert ticket["triage_method"] == "rules"
+    assert ticket["triaged_at"] is not None
+
+
 def test_get_evaluation(test_app_client):
     response = test_app_client.get("/api/evaluate")
     assert response.status_code == 200

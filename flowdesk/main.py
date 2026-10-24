@@ -1,12 +1,15 @@
 """FlowDesk FastAPI application server."""
 
+import uuid
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from diagnose import run_diagnostics
@@ -122,6 +125,45 @@ def list_tickets(
 
     tickets = query.limit(limit).all()
     return [t.to_dict() for t in tickets]
+
+
+class CreateTicketRequest(BaseModel):
+    subject: str = Field(..., min_length=2)
+    body: str = Field(..., min_length=2)
+    platform: str = Field(default="windows")
+    app_version: str = Field(default="1.4.3")
+    os_version: str = Field(default="Windows 11")
+    plan_tier: str = Field(default="pro")
+    channel: str = Field(default="in-app")
+
+
+@app.post("/api/tickets")
+def create_ticket(req: CreateTicketRequest, db: Session = Depends(get_db)):
+    """Create a new customer ticket, run real-time triage, and update pattern detection."""
+    ticket_id = f"TCK-{uuid.uuid4().hex[:6].upper()}"
+
+    ticket = Ticket(
+        id=ticket_id,
+        created_at=datetime.now(UTC),
+        channel=req.channel,
+        platform=req.platform.lower().strip(),
+        app_version=req.app_version.strip(),
+        os_version=req.os_version.strip(),
+        subject=req.subject.strip(),
+        body=req.body.strip(),
+        plan_tier=req.plan_tier.lower().strip(),
+    )
+
+    # Real-time automated triage
+    triage_and_update_ticket(ticket)
+    db.add(ticket)
+    db.commit()
+
+    # Re-evaluate incident patterns
+    run_pattern_detection(db)
+
+    db.refresh(ticket)
+    return ticket.to_dict()
 
 
 @app.get("/api/tickets/{ticket_id}")

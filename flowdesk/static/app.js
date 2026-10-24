@@ -481,6 +481,61 @@ async function loadEvaluationBenchmark() {
   }
 }
 
+// Create New Ticket / Log Bug Handlers
+function openCreateTicketModal() {
+  document.getElementById("create-ticket-form").reset();
+  document.getElementById("modal-create-ticket").classList.remove("hidden");
+}
+
+function closeCreateTicketModal() {
+  document.getElementById("modal-create-ticket").classList.add("hidden");
+}
+
+async function submitNewTicket(event) {
+  event.preventDefault();
+  const submitBtn = document.getElementById("btn-submit-ticket");
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xs"></i> Ingesting...`;
+
+  const payload = {
+    subject: document.getElementById("new-ticket-subject").value.trim(),
+    body: document.getElementById("new-ticket-body").value.trim(),
+    platform: document.getElementById("new-ticket-platform").value,
+    plan_tier: document.getElementById("new-ticket-tier").value,
+    app_version: document.getElementById("new-ticket-app-ver").value.trim() || "1.4.3",
+    os_version: document.getElementById("new-ticket-os-ver").value.trim() || "Windows 11",
+    channel: "in-app",
+  };
+
+  try {
+    const res = await fetch("/api/tickets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to create ticket: ${res.statusText}`);
+    }
+
+    const newTicket = await res.json();
+    closeCreateTicketModal();
+
+    // Refresh UI
+    await loadStats();
+    await fetchTickets();
+    await loadIncidents();
+
+    // Open ticket details modal immediately so user sees the real-time triage
+    openTicketModal(newTicket.id);
+  } catch (err) {
+    alert(`Error logging ticket: ${err.message}`);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = `<i class="fa-solid fa-bolt"></i> Ingest & Auto-Triage`;
+  }
+}
+
 // Utility
 function escapeHtml(str) {
   if (!str) return "";
