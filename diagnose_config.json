@@ -1,0 +1,21 @@
+{
+  "timeout_seconds": 3.0,
+  "latency_warn_threshold_ms": 500.0,
+  "endpoints": [
+    {
+      "name": "Cloudflare Public DNS Edge",
+      "host": "one.one.one.one",
+      "url": "https://one.one.one.one"
+    },
+    {
+      "name": "Google DNS Edge",
+      "host": "dns.google",
+      "url": "https://dns.google"
+    },
+    {
+      "name": "Public Connectivity Probe",
+      "host": "example.com",
+      "url": "https://example.com"
+    }
+  ]
+}
