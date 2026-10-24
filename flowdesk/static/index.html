@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlowDesk — Support Engineering Toolkit</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 px-6 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="h-9 w-9 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i class="fa-solid fa-microphone-lines text-white text-base"></i>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="font-bold text-lg tracking-tight text-white">FlowDesk</h1>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-medium">Support Toolkit</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Independent Portfolio</span>
+          </div>
+          <p class="text-xs text-slate-400">Technical Support Engineering & Incident Triage for Voice-Dictation SaaS</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="runIncidentDetection()" class="px-3 py-1.5 text-xs font-medium rounded-md bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-arrows-split-up-and-left text-indigo-400"></i> Cluster Incidents
+        </button>
+        <button onclick="runBatchTriage()" class="px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-bolt"></i> Run Batch Triage
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 py-6 space-y-6">
+
+    <!-- KPI Summary Row -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-400">Total Ingested Tickets</p>
+          <p id="stat-total" class="text-2xl font-bold text-white mt-1">--</p>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400">
+          <i class="fa-solid fa-inbox text-lg"></i>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-400">Probable Incidents (3+ Spikes)</p>
+          <p id="stat-incidents" class="text-2xl font-bold text-amber-400 mt-1">--</p>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+          <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-400">P0 / P1 Critical Blockers</p>
+          <p id="stat-critical" class="text-2xl font-bold text-rose-400 mt-1">--</p>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
+          <i class="fa-solid fa-fire text-lg"></i>
+        </div>
+      </div>
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+        <div>
+          <p class="text-xs font-medium text-slate-400">Engine Triage Mode</p>
+          <p class="text-sm font-semibold text-emerald-400 mt-1 flex items-center gap-1.5">
+            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> Rules-First + Safe Fallback
+          </p>
+        </div>
+        <div class="h-10 w-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <i class="fa-solid fa-shield-halved text-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-slate-800 space-x-1">
+      <button onclick="switchTab('tab-tickets')" id="tab-btn-tickets" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-indigo-500 text-indigo-400 flex items-center gap-2">
+        <i class="fa-solid fa-list-check"></i> Tickets Triage Queue
+      </button>
+      <button onclick="switchTab('tab-incidents')" id="tab-btn-incidents" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-circle-nodes"></i> Pattern Detection & Incidents
+      </button>
+      <button onclick="switchTab('tab-kb')" id="tab-btn-kb" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-book-bookmark"></i> Known Issues (11 Articles)
+      </button>
+      <button onclick="switchTab('tab-diagnostics')" id="tab-btn-diagnostics" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-network-wired"></i> Network Diagnostics
+      </button>
+      <button onclick="switchTab('tab-eval')" id="tab-btn-eval" class="tab-btn px-4 py-2.5 text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2">
+        <i class="fa-solid fa-chart-pie"></i> Benchmark Evaluation
+      </button>
+    </div>
+
+    <!-- TAB 1: TICKETS QUEUE -->
+    <section id="tab-tickets" class="tab-panel space-y-4">
+      <!-- Filter Bar -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 flex flex-wrap gap-3 items-center justify-between">
+        <div class="flex flex-wrap items-center gap-3">
+          <input type="text" id="filter-search" oninput="debounceFilter()" placeholder="Search subject or body..." class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-64">
+          <select id="filter-category" onchange="fetchTickets()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+            <option value="">All Categories</option>
+            <option value="network/timeouts">network/timeouts</option>
+            <option value="audio/mic">audio/mic</option>
+            <option value="text insertion">text insertion</option>
+            <option value="hotkeys">hotkeys</option>
+            <option value="billing">billing</option>
+            <option value="account/login">account/login</option>
+            <option value="performance">performance</option>
+            <option value="feature request">feature request</option>
+            <option value="other">other</option>
+          </select>
+          <select id="filter-severity" onchange="fetchTickets()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+            <option value="">All Severities</option>
+            <option value="P0">P0 (Outage)</option>
+            <option value="P1">P1 (Critical)</option>
+            <option value="P2">P2 (Degraded)</option>
+            <option value="P3">P3 (Minor)</option>
+          </select>
+          <select id="filter-platform" onchange="fetchTickets()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+            <option value="">All Platforms</option>
+            <option value="windows">Windows</option>
+            <option value="macos">macOS</option>
+            <option value="ios">iOS</option>
+            <option value="android">Android</option>
+            <option value="web">Web</option>
+          </select>
+          <select id="filter-tier" onchange="fetchTickets()" class="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+            <option value="">All Tiers</option>
+            <option value="enterprise">Enterprise</option>
+            <option value="pro">Pro</option>
+            <option value="free">Free</option>
+          </select>
+        </div>
+        <div class="text-xs text-slate-400">
+          Showing <span id="ticket-count" class="font-semibold text-slate-200">0</span> tickets
+        </div>
+      </div>
+
+      <!-- Tickets Table -->
+      <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-950/80 text-slate-400 uppercase tracking-wider font-semibold border-b border-slate-800">
+              <tr>
+                <th class="px-4 py-3">ID</th>
+                <th class="px-4 py-3">Platform</th>
+                <th class="px-4 py-3">Subject & Preview</th>
+                <th class="px-4 py-3">Category</th>
+                <th class="px-4 py-3">Severity</th>
+                <th class="px-4 py-3">Sentiment</th>
+                <th class="px-4 py-3">Triage</th>
+                <th class="px-4 py-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-table-body" class="divide-y divide-slate-800 text-slate-300">
+              <!-- Loaded via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: PATTERN DETECTION & INCIDENTS -->
+    <section id="tab-incidents" class="tab-panel space-y-4 hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+        <div>
+          <h2 class="font-semibold text-white text-base">Probable Incidents & Shared Signal Clusters</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Identifies clusters of 3+ tickets exhibiting identical error signatures within rolling time windows.</p>
+        </div>
+        <button onclick="runIncidentDetection()" class="px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-rotate text-xs"></i> Refresh Clusters
+        </button>
+      </div>
+
+      <div id="incidents-container" class="space-y-3">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- TAB 3: KNOWLEDGE BASE -->
+    <section id="tab-kb" class="tab-panel space-y-4 hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+        <h2 class="font-semibold text-white text-base">Frontline Known Issues Knowledge Base</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Pre-vetted engineering articles with symptom root causes, exact fix steps, data safety notices, and escalation boundaries.</p>
+      </div>
+
+      <div id="kb-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+    <!-- TAB 4: DIAGNOSTICS HELPER -->
+    <section id="tab-diagnostics" class="tab-panel space-y-4 hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+        <div>
+          <h2 class="font-semibold text-white text-base">Network & Connectivity Diagnostics</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Standalone diagnostic probes: DNS resolution, TLS handshake verification, and HTTP latency reachability.</p>
+        </div>
+        <button onclick="runDiagnosticsFromUI()" id="btn-run-diag" class="px-3.5 py-1.5 text-xs font-medium rounded-md bg-emerald-600 hover:bg-emerald-500 text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-play text-xs"></i> Run Diagnostic Probe
+        </button>
+      </div>
+
+      <div id="diagnostics-results" class="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+        <p class="text-xs text-slate-500">Click "Run Diagnostic Probe" to test local connectivity against declared endpoints in <code>diagnose_config.json</code>.</p>
+      </div>
+    </section>
+
+    <!-- TAB 5: BENCHMARK EVALUATION -->
+    <section id="tab-eval" class="tab-panel space-y-4 hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+        <div>
+          <h2 class="font-semibold text-white text-base">Triage Engine Ground-Truth Benchmark</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Evaluates heuristic triage rules against 50 ground-truth labeled tickets in <code>data/labeled_tickets.csv</code>.</p>
+        </div>
+        <button onclick="loadEvaluationBenchmark()" class="px-3 py-1.5 text-xs font-medium rounded-md bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-1.5">
+          <i class="fa-solid fa-calculator text-xs"></i> Recalculate Benchmark
+        </button>
+      </div>
+
+      <div id="eval-container" class="space-y-4">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: TICKET DETAILS & ACTION WORKFLOWS -->
+  <div id="modal-ticket" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="flex items-center space-x-3">
+          <span id="modal-ticket-id" class="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono text-xs font-semibold">TCK-0000</span>
+          <h3 id="modal-ticket-subject" class="font-semibold text-white text-base">Ticket Subject</h3>
+        </div>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-5 text-xs">
+        <!-- Meta info -->
+        <div class="grid grid-cols-4 gap-3 bg-slate-950 border border-slate-800 rounded-xl p-3">
+          <div><span class="text-slate-500">Platform:</span> <p id="modal-platform" class="font-medium text-slate-200 mt-0.5">--</p></div>
+          <div><span class="text-slate-500">Version:</span> <p id="modal-version" class="font-medium text-slate-200 mt-0.5">--</p></div>
+          <div><span class="text-slate-500">Plan Tier:</span> <p id="modal-tier" class="font-medium text-slate-200 mt-0.5">--</p></div>
+          <div><span class="text-slate-500">Severity:</span> <p id="modal-severity" class="font-medium text-slate-200 mt-0.5">--</p></div>
+        </div>
+
+        <!-- Raw Body -->
+        <div>
+          <label class="font-semibold text-slate-300 block mb-1">Customer Message</label>
+          <div id="modal-body" class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-slate-300 whitespace-pre-wrap leading-relaxed"></div>
+        </div>
+
+        <!-- Triage Rationale -->
+        <div class="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-3.5 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-indigo-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-microchip"></i> Triage Analysis
+            </span>
+            <span id="modal-triage-method" class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-mono text-[10px]">rules</span>
+          </div>
+          <p id="modal-triage-reason" class="text-slate-300 text-xs"></p>
+        </div>
+
+        <!-- Action Output Tabs / Area -->
+        <div class="space-y-3">
+          <div class="flex gap-2 border-b border-slate-800 pb-2">
+            <button onclick="generateReplyForCurrentTicket()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-reply"></i> Draft Customer Reply
+            </button>
+            <button onclick="generateBugReportForCurrentTicket()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-file-lines text-indigo-400"></i> Generate Bug Report
+            </button>
+          </div>
+
+          <div id="action-output-area" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span id="action-output-title" class="font-semibold text-indigo-400">Generated Draft</span>
+              <button onclick="copyActionOutput()" class="px-2.5 py-1 text-[11px] rounded bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center gap-1">
+                <i class="fa-solid fa-copy"></i> Copy
+              </button>
+            </div>
+            <pre id="action-output-content" class="text-xs text-slate-300 whitespace-pre-wrap overflow-x-auto"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-500 bg-slate-950">
+    FlowDesk Portfolio Project — Inspired by voice-dictation workflows. Synthetic ticket data. No affiliation with Wispr.
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+id,subject,body,expected_category,expected_severity,plan_tier
+LBL-001,Connection drops on Zscaler VPN,App fails with ERR_PROXY_CONNECTION_FAILED on corporate network,network/timeouts,P1,enterprise
+LBL-002,ERR_TUNNEL_CONNECTION_FAILED,Proxy tunnel terminates after 10 seconds of streaming audio,network/timeouts,P1,enterprise
+LBL-003,Stuck on Taking longer than usual,Pill spins forever saying Taking longer than usual before timeout,network/timeouts,P2,pro
+LBL-004,SSL Deep Inspection fails TLS handshake,Firewall replaces certificate causing CERT_UNTRUSTED_ISSUER,network/timeouts,P1,enterprise
+LBL-005,No Model Available error on hotkey,Red modal alert: No Model Available for English US,network/timeouts,P0,pro
+LBL-006,No Model Available across all team machines,Our entire team cannot dictate due to No Model Available,network/timeouts,P0,enterprise
+LBL-007,Missing first words with AirPods Pro,Audio starts half a second too late cutting off first 2 words,audio/mic,P2,pro
+LBL-008,Bluetooth headset mic clipping speech,Initial word omitted when dictating on wireless headset,audio/mic,P2,free
+LBL-009,Hands-Free AG Audio mode distortion,Windows switches Sony headphones to low quality mono Hands-Free AG,audio/mic,P2,pro
+LBL-010,Bluetooth audio device switching crash,AUDCLNT_E_UNSUPPORTED_FORMAT crash when switching input mic,audio/mic,P2,pro
+LBL-011,Text not pasting into Slack,Transcription finishes but text not pasting into cursor caret,text insertion,P2,pro
+LBL-012,Keystroke injection failure,Accessibility enabled but simulated typing fails in Word,text insertion,P2,enterprise
+LBL-013,French AZERTY swaps A and Q,Typing on AZERTY keyboard pastes Q instead of A and Z instead of W,text insertion,P2,pro
+LBL-014,German QWERTZ layout key transposition,Pasted text reverses Y and Z on German layout,text insertion,P2,pro
+LBL-015,Dvorak layout typed as gibberish,FlowDesk ignores Dvorak keyboard layout and injects QWERTY,text insertion,P2,free
+LBL-016,Android work profile sandbox blocks audio,Managed Knox container denies AudioRecord permission,text insertion,P2,enterprise
+LBL-017,Intune MDM prevents clipboard sharing,Cross-profile paste blocked between work and personal profile,text insertion,P2,enterprise
+LBL-018,Hotkey Option+Space blocked in Terminal,macOS Secure Keyboard Entry prevents global hotkey capture,hotkeys,P2,pro
+LBL-019,Secure Keyboard Entry conflict in Bitwarden,Global shortcut unresponsive while password manager is unlocked,hotkeys,P2,enterprise
+LBL-020,Cannot customize dictation shortcut,Keybinding Ctrl+Space conflicts with system input switcher,hotkeys,P3,free
+LBL-021,Infinite Cloudflare captcha loop on login,Captcha ticks green then refreshes back to empty login form,account/login,P1,pro
+LBL-022,Google SSO state_mismatch redirect,Browser redirects back to login page with state_mismatch error,account/login,P1,enterprise
+LBL-023,Password reset email not arriving,Requested password reset link 3 times but no email received,account/login,P2,free
+LBL-024,Word limit not resetting after Pro upgrade,Paid Stripe invoice but account still says 0 words remaining,billing,P1,pro
+LBL-025,Monthly billing cycle did not renew word count,Credit card charged renewal fee but balance did not reset,billing,P1,pro
+LBL-026,Need VAT invoice with company tax ID,Please update invoice #4829 with EU VAT ID DE829104,billing,P3,pro
+LBL-027,High CPU usage during idle,Helper background process consumes 50% CPU and drains battery,performance,P2,pro
+LBL-028,Memory leak in FlowDesk.exe,RAM consumption grows to 2GB after running for 6 hours,performance,P2,pro
+LBL-029,Sluggish typing lag in heavy documents,Inserted text lags by 3 seconds in large 100-page Google Doc,performance,P2,pro
+LBL-030,Feature Request: Custom medical vocabulary,Please add ability to import custom dictionary terms and acronyms,feature request,P3,pro
+LBL-031,Feature request: Local offline Whisper model,Can we run a small local transcription model offline?,feature request,P3,enterprise
+LBL-032,Support for Japanese language dictation,When will Japanese Kanji transcription support be added?,feature request,P3,free
+LBL-033,Data retention policy and GDPR DPA inquiry,Does FlowDesk retain customer audio recordings on server?,other,P3,enterprise
+LBL-034,Audio cutting out because of VPN connection,Voice recording aborts when our company VPN connection drops,network/timeouts,P1,enterprise
+LBL-035,Payment failed on American Express card,Update payment method is giving an error on billing page,billing,P2,pro
+LBL-036,Double charged on annual subscription,Charged twice on my credit card statement for the same seat,billing,P1,pro
+LBL-037,Hotkey fails when 1Password is open,Secure Keyboard Entry in password app blocks dictation,hotkeys,P2,pro
+LBL-038,AirPods latency cuts off start of sentence,Always omits the first two words on wireless earbuds,audio/mic,P2,pro
+LBL-039,Text pasted with extra trailing newlines,Pasting text into Markdown editors adds double line breaks,text insertion,P2,free
+LBL-040,Cloudflare Turnstile verification failed,Security check loop prevents accessing web account settings,account/login,P2,free
+LBL-041,Fan spins up loud whenever dictation starts,CPU spikes to 95% on older Intel MacBook,performance,P2,free
+LBL-042,Request for keyboard shortcut cheatsheet,Where can I find a list of all supported hotkeys?,other,P3,free
+LBL-043,Spanish accents stripped on paste,Letters like á é í are inserted without accent marks,text insertion,P2,pro
+LBL-044,Cannot select external Yeti microphone,App only shows Built-in Microphone in audio settings dropdown,audio/mic,P2,free
+LBL-045,Connection lost error code 1006,WebSocket closes unexpectedly with error code 1006,network/timeouts,P2,pro
+LBL-046,Can you add dark mode to the settings window?,Feature request: please support true black dark theme,feature request,P3,free
+LBL-047,Two factor auth code rejected,Authenticator 6-digit TOTP code says invalid token,account/login,P1,pro
+LBL-048,Android managed container microphone crash,SecurityException in work profile when opening audio stream,text insertion,P2,enterprise
+LBL-049,Refund request for unused enterprise seats,We downgraded from 20 to 10 seats and request a credit,billing,P2,enterprise
+LBL-050,General question about export formats,Can I export dictation history to CSV or JSON format?,feature request,P3,free
